@@ -48,20 +48,27 @@ async def test_slash_confirm_mirrors_message_into_content():
 
 
 @pytest.mark.asyncio
-async def test_clarify_with_choices_mirrors_question_into_content():
+async def test_clarify_with_choices_mirrors_full_choices_into_content():
     adapter = DiscordAdapter(PlatformConfig(enabled=True, token="***"))
     sent = _capture_channel(adapter)
+    long_choice = (
+        "Sales Item (Recommended; match the existing code and domain-model terminology "
+        "even if Spec 001 differs)"
+    )
 
     result = await adapter.send_clarify(
         chat_id="555",
-        question="Which environment should I deploy to?",
-        choices=["staging", "production"],
+        question="Which term should be canonical?",
+        choices=[long_choice, "Sale Item (matches Spec 001's glossary)"],
         clarify_id="cl1",
         session_key="discord:555",
     )
 
     assert result.success is True
     assert sent["view"] is not None
-    assert "Which environment should I deploy to?" in sent["content"]
+    assert "Which term should be canonical?" in sent["content"]
+    assert long_choice in sent["content"]
+    assert "Sale Item (matches Spec 001's glossary)" in sent["content"]
+    assert sent["view"].children[0].label.endswith("…")
 
 

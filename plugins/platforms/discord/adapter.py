@@ -5606,8 +5606,17 @@ class DiscordAdapter(DiscordMediaMixin, BasePlatformAdapter):
             else:
                 hint = "Reply in this channel with your answer."
                 view = None
+            prompt_body = str(question or "").strip()
+            if clean_choices:
+                full_choices = "\n".join(
+                    f"{index + 1}. {choice}" for index, choice in enumerate(clean_choices)
+                )
+                if prompt_body:
+                    prompt_body = f"{prompt_body}\n\n**Options:**\n{full_choices}"
+                else:
+                    prompt_body = f"**Options:**\n{full_choices}"
             content = self._self_contained_prompt_content(
-                "❓ **Hermes needs your input**", str(question or "").strip(), tail=f"\n\n{hint}",
+                "❓ **Hermes needs your input**", prompt_body, tail=f"\n\n{hint}",
             )
             send_kwargs = {"content": content, "embed": embed}
             if view:
