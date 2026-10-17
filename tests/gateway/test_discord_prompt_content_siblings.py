@@ -52,23 +52,23 @@ async def test_clarify_with_choices_mirrors_full_choices_into_content():
     adapter = DiscordAdapter(PlatformConfig(enabled=True, token="***"))
     sent = _capture_channel(adapter)
     long_choice = (
-        "Sales Item (Recommended; match the existing code and domain-model terminology "
-        "even if Spec 001 differs)"
+        "Option A (Recommended; select this when it best matches the requirements "
+        "described in the question)"
     )
 
     result = await adapter.send_clarify(
         chat_id="555",
-        question="Which term should be canonical?",
-        choices=[long_choice, "Sale Item (matches Spec 001's glossary)"],
+        question="Which option should be selected?",
+        choices=[long_choice, "Option B (the alternative)"],
         clarify_id="cl1",
         session_key="discord:555",
     )
 
     assert result.success is True
     assert sent["view"] is not None
-    assert "Which term should be canonical?" in sent["content"]
+    assert "Which option should be selected?" in sent["content"]
     assert long_choice in sent["content"]
-    assert "Sale Item (matches Spec 001's glossary)" in sent["content"]
+    assert "Option B (the alternative)" in sent["content"]
     assert sent["view"].children[0].label.endswith("…")
 
 
